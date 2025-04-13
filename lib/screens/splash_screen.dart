@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-import 'login_screen.dart'; // to be created
-import 'home_screen.dart'; // to be created
+import '../common_libs.dart';
+import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,25 +10,41 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  User? _user;
+
+  Future<void> _getAuth() async {
+    setState(() {
+      _user = Supabase.instance.client.auth.currentUser;
+    });
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      setState(() {
+        _user = data.session?.user;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), _checkAuth);
+    Future.delayed(const Duration(seconds: 1), _checkAuth);
   }
 
-  void _checkAuth() {
-    // final user = FirebaseAuth.instance.currentUser;
-    // if (user == null) {
-    //   Navigator.pushReplacement(
-    //     context,
-    //     MaterialPageRoute(builder: (_) => const LoginScreen()),
-    //   );
-    // } else {
-    //   Navigator.pushReplacement(
-    //     context,
-    //     MaterialPageRoute(builder: (_) => const HomeScreen()),
-    //   );
-    // }
+  void _checkAuth() async {
+    await _getAuth();
+    if (mounted) {
+      if (_user == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    }
+    Logger().i(_user?.toJson().toString());
   }
 
   @override
