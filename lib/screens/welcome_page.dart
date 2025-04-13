@@ -18,21 +18,34 @@ class _WelcomePageState extends State<WelcomePage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        unselectedItemColor: Colors.grey,
         selectedItemColor: Colors.blue.shade900,
+        type: BottomNavigationBarType.shifting,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.directions_run),
+            icon: Icon(Icons.home_filled, color: Colors.grey),
+            label: 'Home',
+            activeIcon: Icon(Icons.home_filled, color: Colors.blue.shade900),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_run, color: Colors.grey),
+            activeIcon: Icon(Icons.directions_run, color: Colors.blue.shade900),
             label: 'Activity',
+            // activeIcon:
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.check_box_outlined),
             label: 'Goals',
+            activeIcon: Icon(
+              Icons.check_box_outlined,
+              color: Colors.blue.shade900,
+            ),
           ),
         ],
       ),
