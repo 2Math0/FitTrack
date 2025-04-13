@@ -1,7 +1,4 @@
-import 'package:fit_track/models/user_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+import '../common_libs.dart';
 
 class UserManager {
   // Private constructor to prevent instantiation
@@ -29,7 +26,7 @@ class UserManager {
           ).showSnackBar(SnackBar(content: Text(successMessage)));
         }
       }
-      return response.data as T?;
+      return response as T?;
     } catch (e) {
       // Log the error
       _logger.e('Exception: $e');
@@ -93,10 +90,7 @@ class UserManager {
 
   // Sign out function
   Future<void> signOut(BuildContext context) async {
-    final response = await baseRequest<void>(
-      request: supabase.auth.signOut(),
-      context: context,
-    );
+    await baseRequest<void>(request: supabase.auth.signOut(), context: context);
     _logger.i('Successfully signed out');
   }
 

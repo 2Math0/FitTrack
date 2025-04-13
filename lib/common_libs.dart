@@ -11,3 +11,5 @@ export 'package:fit_track/utils/validators.dart';
 export 'package:flutter/cupertino.dart' hide RefreshCallback;
 export 'package:fit_track/app/routes.dart';
 export 'package:fit_track/widgets/loader.dart';
+export 'package:fit_track/models/user_model.dart';
+export 'package:fit_track/services/auth_service.dart';

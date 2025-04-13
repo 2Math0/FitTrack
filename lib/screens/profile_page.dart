@@ -1,6 +1,4 @@
 import 'package:fit_track/common_libs.dart';
-import 'package:fit_track/models/user_model.dart';
-import 'package:fit_track/services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,22 +9,29 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late UserModel? user;
-
   final nameController = TextEditingController();
   final emailController = TextEditingController();
 
   bool isNotificationEnabled = true;
+  String? selectedGender;
 
-  Future getUser() async =>
-      user = await UserManager.instance.fetchUserFromSupabase();
+  // List of genders for the dropdown
+  final List<String> genderList = ['Male', 'Female'];
+
+  Future<void> getUser() async {
+    user = await UserManager.instance.fetchUserFromSupabase();
+    if (user != null) {
+      nameController.text = user?.name ?? '';
+      emailController.text = user?.email ?? '';
+      selectedGender = user?.gender;
+      setState(() {});
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    getUser().then((_) {
-      nameController.text = user?.name ?? '';
-      emailController.text = user?.email ?? '';
-    });
+    getUser();
   }
 
   @override
@@ -50,10 +55,10 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const CircleAvatar(
-                  radius: 45,
-                  backgroundImage: AssetImage('assets/images/account.png'),
-                ),
+                // const CircleAvatar(
+                //   radius: 45,
+                //   backgroundImage: AssetImage('assets/images/account.png'),
+                // ),
                 const SizedBox(width: 45),
                 Expanded(
                   child: Container(
@@ -88,7 +93,22 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        TextField(
+                        DropdownButtonFormField<String>(
+                          value: selectedGender,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedGender = value;
+                            });
+                          },
+                          items:
+                              genderList
+                                  .map(
+                                    (gender) => DropdownMenuItem<String>(
+                                      value: gender,
+                                      child: Text(gender),
+                                    ),
+                                  )
+                                  .toList(),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -101,11 +121,24 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 12),
                       ],
                     ),
                   ),
                 ),
               ],
+            ),
+            PrimaryButton(
+              text: 'Update User',
+              onPressed: () {
+                UserManager.instance.updateUserMetadata(
+                  user: user!.copyWith(
+                    name: nameController.text,
+                    gender: selectedGender,
+                  ),
+                  context: context,
+                );
+              },
             ),
             const SizedBox(height: 24),
             ListTile(
@@ -136,45 +169,50 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                title: const Text(
-                  "Connect Google Fit",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onTap: () {},
-              ),
-            ),
+            _buildConnectGoogleFit(),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                title: const Text(
-                  "Log Out",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onTap: () {},
-              ),
-            ),
+            _buildLogOutTile(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildConnectGoogleFit() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        title: const Text(
+          "Connect Google Fit",
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
+        ),
+        onTap: () {},
+      ),
+    );
+  }
+
+  Widget _buildLogOutTile() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+        title: const Text(
+          "Log Out",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+        ),
+        onTap: () {
+          UserManager.instance.signOut(context);
+          AppNavigator.pushReplacement(context, AppRoutes.login);
+        },
       ),
     );
   }

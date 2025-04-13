@@ -1,16 +1,16 @@
 class UserModel {
   final String id;
   final String email;
-  final String name;
+  final String? name;
   final String gender;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   UserModel({
     required this.id,
     required this.email,
-    required this.name,
+    this.name,
     required this.gender,
-    required this.createdAt,
+    this.createdAt,
   });
 
   // Convert from Supabase User Model to UserModel
@@ -20,7 +20,10 @@ class UserModel {
       email: supabaseUser['email'],
       name: supabaseUser['user_metadata']['name'] ?? '',
       gender: supabaseUser['user_metadata']['gender'] ?? '',
-      createdAt: DateTime.parse(supabaseUser['created_at']),
+      createdAt:
+          supabaseUser['created_at'] != null
+              ? DateTime.parse(supabaseUser['created_at'])
+              : null,
     );
   }
 
@@ -30,7 +33,23 @@ class UserModel {
       'id': id,
       'email': email,
       'user_metadata': {'name': name, 'gender': gender},
-      'created_at': createdAt.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
     };
+  }
+
+  UserModel copyWith({
+    String? id,
+    String? email,
+    String? name,
+    String? gender,
+    DateTime? createdAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      email: email ?? this.email,
+      gender: gender ?? this.gender,
+      createdAt: createdAt ?? this.createdAt,
+      name: name ?? this.name,
+    );
   }
 }

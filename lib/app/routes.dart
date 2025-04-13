@@ -5,12 +5,12 @@ import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
 
-class AppRoutes {
-  static const String home = '/home';
-  static const String login = '/login';
-  static const String register = '/register';
-  static const String splash = 'splash';
-  static const String profile = '/profile';
+sealed class AppRoutes {
+  static const splash = '/';
+  static const login = 'login';
+  static const register = '/register';
+  static const home = 'home';
+  static const profile = '/profile';
 }
 
 class AppNavigator {
@@ -22,10 +22,10 @@ class AppNavigator {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case AppRoutes.register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      case AppRoutes.home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case AppRoutes.profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
+      case AppRoutes.home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       default:
         return MaterialPageRoute(
           builder:
