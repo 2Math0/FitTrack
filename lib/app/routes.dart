@@ -1,9 +1,9 @@
 import 'package:fit_track/screens/profile_page.dart';
 import 'package:flutter/material.dart';
-import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/welcome_page.dart';
 
 sealed class AppRoutes {
   static const splash = '/';
@@ -25,7 +25,7 @@ class AppNavigator {
       case AppRoutes.profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
       case AppRoutes.home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        return MaterialPageRoute(builder: (_) => const WelcomePage());
       default:
         return MaterialPageRoute(
           builder:
