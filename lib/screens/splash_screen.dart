@@ -35,15 +35,9 @@ class _SplashScreenState extends State<SplashScreen> {
     await _getAuth();
     if (mounted) {
       if (_user == null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-        );
+        AppNavigator.push(context, AppRoutes.login);
       } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        AppNavigator.push(context, AppRoutes.home);
       }
     }
     Logger().i(_user?.toJson().toString());

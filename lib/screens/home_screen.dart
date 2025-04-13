@@ -1,5 +1,8 @@
+
+import 'package:fit_track/screens/profile_page.dart';
+
+
 import '../common_libs.dart';
-import 'login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,10 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _signOut(BuildContext context) async {
     await Supabase.instance.client.auth.signOut();
     if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      AppNavigator.push(context, AppRoutes.login);
     }
   }
 
@@ -30,6 +30,14 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () => _signOut(context),
             icon: const Icon(Icons.logout),
+          ),
+          IconButton(
+            onPressed:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProfilePage()),
+                ),
+            icon: const Icon(CupertinoIcons.person),
           ),
         ],
       ),

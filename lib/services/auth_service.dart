@@ -1,39 +1,133 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:google_sign_in/google_sign_in.dart';
+import 'package:fit_track/models/user_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
-// class AuthService {
-//   final FirebaseAuth _auth = FirebaseAuth.instance;
+class UserManager {
+  // Private constructor to prevent instantiation
+  UserManager._();
 
-//   Stream<User?> get authState => _auth.authStateChanges();
+  // Singleton instance
+  static final UserManager instance = UserManager._();
 
-//   Future<UserCredential> signInWithEmail(String email, String password) async {
-//     return await _auth.signInWithEmailAndPassword(
-//       email: email,
-//       password: password,
-//     );
-//   }
+  final SupabaseClient supabase = Supabase.instance.client;
+  final Logger _logger = Logger();
 
-//   Future<UserCredential> signUpWithEmail(String email, String password) async {
-//     return await _auth.createUserWithEmailAndPassword(
-//       email: email,
-//       password: password,
-//     );
-//   }
+  // Base function to handle requests and error logging
+  Future<T?> baseRequest<T>({
+    required Future<dynamic> request,
+    required BuildContext context,
+    String? successMessage,
+  }) async {
+    try {
+      final response = await request;
+      // Optionally show success message
+      if (successMessage != null) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(successMessage)));
+        }
+      }
+      return response.data as T?;
+    } catch (e) {
+      // Log the error
+      _logger.e('Exception: $e');
 
-//   Future<void> signOut() async {
-//     await _auth.signOut();
-//   }
+      // Show exception SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An unexpected error occurred')),
+        );
+      }
+      return null;
+    }
+  }
 
-//   Future<UserCredential> signInWithGoogle() async {
-//     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-//     final GoogleSignInAuthentication? googleAuth =
-//         await googleUser?.authentication;
+  // Sign up function
+  Future<UserModel?> signUp({
+    required String email,
+    required String password,
+    required String name,
+    required String gender,
+    required BuildContext context,
+  }) async {
+    final response = await baseRequest<Map<String, dynamic>>(
+      request: supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name, 'gender': gender},
+      ),
+      context: context,
+    );
 
-//     final credential = GoogleAuthProvider.credential(
-//       accessToken: googleAuth?.accessToken,
-//       idToken: googleAuth?.idToken,
-//     );
+    if (response == null) {
+      return null;
+    }
 
-//     return await _auth.signInWithCredential(credential);
-//   }
-// }
+    // On successful sign-up, fetch user details
+    return fetchUserFromSupabase();
+  }
+
+  // Sign in function
+  Future<UserModel?> signIn({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
+    final response = await baseRequest<Map<String, dynamic>>(
+      request: supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      ),
+      context: context,
+    );
+
+    if (response == null) {
+      return null;
+    }
+
+    // On successful sign-in, fetch user details
+    return fetchUserFromSupabase();
+  }
+
+  // Sign out function
+  Future<void> signOut(BuildContext context) async {
+    final response = await baseRequest<void>(
+      request: supabase.auth.signOut(),
+      context: context,
+    );
+    _logger.i('Successfully signed out');
+  }
+
+  // Fetch the user from Supabase after sign-in or sign-up
+  Future<UserModel?> fetchUserFromSupabase() async {
+    UserResponse? userResponse;
+    try {
+      userResponse = await supabase.auth.getUser();
+    } catch (e) {
+      _logger.e('Error fetching user: $e');
+    }
+
+    // Convert Supabase user to custom UserModel
+    return UserModel.fromSupabase(userResponse?.user?.toJson() ?? {});
+  }
+
+  // Update user metadata (name and gender)
+  Future<void> updateUserMetadata({
+    required UserModel user,
+    required BuildContext context,
+  }) async {
+    final UserResponse? response = await baseRequest<UserResponse>(
+      request: supabase.auth.updateUser(
+        UserAttributes(data: {'name': user.name, 'gender': user.gender}),
+      ),
+      context: context,
+      successMessage: 'User metadata updated',
+    );
+
+    if (response?.user != null) {
+      _logger.i('User metadata updated');
+    }
+  }
+}

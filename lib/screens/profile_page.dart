@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:fit_track/common_libs.dart';
+import 'package:fit_track/models/user_model.dart';
+import 'package:fit_track/services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -8,7 +10,24 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late UserModel? user;
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+
   bool isNotificationEnabled = true;
+
+  Future getUser() async =>
+      user = await UserManager.instance.fetchUserFromSupabase();
+
+  @override
+  void initState() {
+    super.initState();
+    getUser().then((_) {
+      nameController.text = user?.name ?? '';
+      emailController.text = user?.email ?? '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +52,9 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const CircleAvatar(
                   radius: 45,
-                  backgroundImage: AssetImage(
-                    'assets/images/account.png',
-                  ),
+                  backgroundImage: AssetImage('assets/images/account.png'),
                 ),
-                const SizedBox(
-                  width: 45,
-                ),
+                const SizedBox(width: 45),
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(16),
@@ -50,62 +65,35 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Name",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.grey),
-                        ),
                         const SizedBox(height: 6),
-                        TextField(
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
+                        CustomTextField(
+                          label: 'Name',
+                          icon: Icons.person,
+                          controller: nameController,
                         ),
-                        const SizedBox(
-                          height: 12,
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          label: 'Email',
+                          icon: Icons.email_outlined,
+                          enabled: false,
+                          controller: emailController,
                         ),
-                        const Text(
-                          "Email",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.grey),
-                        ),
-                        const SizedBox(height: 6),
-                        TextField(
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
+                        const SizedBox(height: 12),
                         const Text(
                           "Gender",
                           style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.grey),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         TextField(
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -126,17 +114,18 @@ class _ProfilePageState extends State<ProfilePage> {
               title: const Text("App Settings"),
               trailing: const Icon(Icons.arrow_forward_ios, size: 18),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
               onTap: () {},
             ),
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 title: const Text("Notifications"),
                 value: isNotificationEnabled,
                 onChanged: (val) {
@@ -154,10 +143,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 title: const Text(
                   "Connect Google Fit",
                   style: TextStyle(
-                      color: Colors.blue, fontWeight: FontWeight.w600),
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onTap: () {},
               ),
@@ -170,10 +162,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 title: const Text(
                   "Log Out",
-                  style:
-                      TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onTap: () {},
               ),
@@ -183,5 +178,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
 }

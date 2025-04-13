@@ -1,6 +1,4 @@
 import '../common_libs.dart';
-import 'login_screen.dart';
-import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -41,10 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (mounted) {
         // Go to home or show verify email screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        AppNavigator.push(context, AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {
@@ -117,12 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const Text("Already have an account?"),
                       TextButton(
                         onPressed:
-                            () => Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const LoginScreen(),
-                              ),
-                            ),
+                            () => AppNavigator.push(context, AppRoutes.login),
                         child: const Text("Login"),
                       ),
                     ],

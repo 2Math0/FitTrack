@@ -1,5 +1,4 @@
 import 'package:fit_track/common_libs.dart';
-import 'package:fit_track/widgets/logo.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
 
@@ -27,10 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Logger().t(user.user?.toJson().toString());
       if (user.user != null) {
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
+          AppNavigator.push(context, AppRoutes.home);
         }
       }
     } catch (e) {
@@ -111,12 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Text("Don't have an account?"),
                     TextButton(
                       onPressed:
-                          () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RegisterScreen(),
-                            ),
-                          ),
+                          () => AppNavigator.push(context, AppRoutes.register),
                       child: const Text("Sign Up"),
                     ),
                   ],
