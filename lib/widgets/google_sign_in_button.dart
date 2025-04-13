@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:fit_track/common_libs.dart';
 
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -9,8 +9,8 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: onPressed,
-      icon: Image.asset(
-        'assets/google_logo.png',
+      icon: SvgPicture.asset(
+        AppAssets.googleIcon,
         height: 24,
       ), // Add Google logo in assets
       label: const Text('Sign in with Google'),

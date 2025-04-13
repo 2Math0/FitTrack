@@ -1,22 +1,28 @@
-import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import '../common_libs.dart';
 import 'login_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   void _signOut(BuildContext context) async {
-    // await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
+    await Supabase.instance.client.auth.signOut();
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
   }
+
+  final user = Supabase.instance.client.auth.currentUser;
 
   @override
   Widget build(BuildContext context) {
-    // final user = FirebaseAuth.instance.currentUser;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('FitTrack Home'),
@@ -33,8 +39,7 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome,user',
-              // 'Welcome, ${user?.email ?? 'User'}',
+              'Welcome, ${user?.email ?? 'User'}',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),

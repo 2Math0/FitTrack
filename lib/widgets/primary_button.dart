@@ -12,10 +12,10 @@ class PrimaryButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(double.infinity, 50),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      child: Text(text, style: const TextStyle(fontSize: 16)),
+      child: Text(text, style: const TextStyle(fontSize: 16, color: Colors.white)),
     );
   }
 }

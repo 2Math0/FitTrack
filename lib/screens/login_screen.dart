@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/primary_button.dart';
-import '../widgets/google_sign_in_button.dart';
+import 'package:fit_track/common_libs.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
 
@@ -15,45 +12,55 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
   // final _auth = AuthService();
   bool isLoading = false;
 
   void _login() async {
     setState(() => isLoading = true);
     try {
-      // await _auth.signInWithEmail(
-      //   emailController.text,
-      //   passwordController.text,
-      // );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      final user = await Supabase.instance.client.auth.signInWithPassword(
+        password: passwordController.text,
+        email: emailController.text,
       );
+      Logger().t(user.user?.toJson().toString());
+      if (user.user != null) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        }
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+      Logger().e(e);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+      }
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-  void _loginWithGoogle() async {
-    setState(() => isLoading = true);
-    try {
-      // await _auth.signInWithGoogle();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google Sign-In failed: $e')));
-    } finally {
-      setState(() => isLoading = false);
-    }
-  }
+  //
+  // void _loginWithGoogle() async {
+  //   setState(() => isLoading = true);
+  //   try {
+  //     // await _auth.signInWithGoogle();
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => const HomeScreen()),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('Google Sign-In failed: $e')));
+  //   } finally {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +71,12 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Image.asset('assets/fittrack_logo.png', height: 100), // Logo
+                SvgPicture.asset(
+                  AppAssets.logo,
+                  height: 100,
+                  colorFilter: ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                ),
+                // Logo
                 const SizedBox(height: 24),
                 CustomTextField(
                   label: 'Email',
@@ -91,9 +103,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: isLoading ? () {} : _login,
                 ),
                 const SizedBox(height: 16),
-                GoogleSignInButton(
-                  onPressed: isLoading ? () {} : _loginWithGoogle,
-                ),
+                // ToDo: Google sign in
+                // GoogleSignInButton(
+                //   onPressed: isLoading ? () {} : _loginWithGoogle,
+                // ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
