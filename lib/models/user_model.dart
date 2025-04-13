@@ -14,15 +14,15 @@ class UserModel {
   });
 
   // Convert from Supabase User Model to UserModel
-  factory UserModel.fromSupabase(Map<String, dynamic> supabaseUser) {
+  factory UserModel.fromSupabase(Map<String, dynamic>? supabaseUser) {
     return UserModel(
-      id: supabaseUser['id'],
-      email: supabaseUser['email'],
-      name: supabaseUser['user_metadata']['name'] ?? '',
-      gender: supabaseUser['user_metadata']['gender'] ?? '',
+      id: supabaseUser?['id'],
+      email: supabaseUser?['email'],
+      name: supabaseUser?['user_metadata']['name'] ?? '',
+      gender: supabaseUser?['user_metadata']['gender'] ?? '',
       createdAt:
-          supabaseUser['created_at'] != null
-              ? DateTime.parse(supabaseUser['created_at'])
+          supabaseUser?['created_at'] != null
+              ? DateTime.parse(supabaseUser!['created_at'])
               : null,
     );
   }

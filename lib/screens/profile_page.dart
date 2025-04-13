@@ -19,7 +19,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final List<String> genderList = ['Male', 'Female'];
 
   Future<void> getUser() async {
-    user = await UserManager.instance.fetchUserFromSupabase();
+    user = UserManager.user;
     if (user != null) {
       nameController.text = user?.name ?? '';
       emailController.text = user?.email ?? '';

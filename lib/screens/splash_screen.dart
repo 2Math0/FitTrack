@@ -1,4 +1,3 @@
-
 import '../common_libs.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -9,15 +8,14 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  User? _user;
+  UserModel? _user;
 
   Future<void> _getAuth() async {
-    setState(() {
-      _user = Supabase.instance.client.auth.currentUser;
-    });
+    _user = await UserManager.instance.fetchUserFromSupabase();
+    setState(() => _user);
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       setState(() {
-        _user = data.session?.user;
+        _user = UserModel.fromSupabase(data.session?.user.toJson());
       });
     });
   }
@@ -37,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
         AppNavigator.push(context, AppRoutes.home);
       }
     }
-    Logger().i(_user?.toJson().toString());
+    Logger().i(_user?.toSupabase().toString());
   }
 
   @override

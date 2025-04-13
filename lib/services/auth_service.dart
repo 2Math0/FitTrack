@@ -7,6 +7,8 @@ class UserManager {
   // Singleton instance
   static final UserManager instance = UserManager._();
 
+  static UserModel? user;
+
   final SupabaseClient supabase = Supabase.instance.client;
   final Logger _logger = Logger();
 
@@ -103,8 +105,10 @@ class UserManager {
       _logger.e('Error fetching user: $e');
     }
 
+    user = UserModel.fromSupabase(userResponse?.user?.toJson() ?? {});
+
     // Convert Supabase user to custom UserModel
-    return UserModel.fromSupabase(userResponse?.user?.toJson() ?? {});
+    return user;
   }
 
   // Update user metadata (name and gender)
