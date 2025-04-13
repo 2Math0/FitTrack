@@ -1,4 +1,5 @@
 import 'package:fit_track/common_libs.dart';
+import 'package:fit_track/widgets/logo.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
 
@@ -71,11 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SvgPicture.asset(
-                  AppAssets.logo,
-                  height: 100,
-                  colorFilter: ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-                ),
+                AppLogo(),
                 // Logo
                 const SizedBox(height: 24),
                 CustomTextField(

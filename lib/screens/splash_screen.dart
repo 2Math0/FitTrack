@@ -1,3 +1,5 @@
+import 'package:fit_track/widgets/loader.dart';
+
 import '../common_libs.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -49,6 +51,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: Center(child: AppLoader()));
   }
 }

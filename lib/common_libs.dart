@@ -6,3 +6,5 @@ export 'package:fit_track/utils/constants.dart';
 export 'package:fit_track/widgets/google_sign_in_button.dart';
 export 'package:fit_track/widgets/primary_button.dart';
 export 'package:fit_track/widgets/custom_text_field.dart';
+export 'package:fit_track/widgets/logo.dart';
+export 'package:fit_track/utils/validators.dart';

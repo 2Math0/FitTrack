@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/primary_button.dart';
+import '../common_libs.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 
@@ -12,38 +10,50 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  // final _auth = AuthService();
+
   bool isLoading = false;
 
   void _signUp() async {
-    if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => isLoading = true);
+
     try {
-      // await _auth.signUpWithEmail(
-      //   emailController.text.trim(),
-      //   passwordController.text,
-      // );
-
-      // Optionally save user's name in Firestore here
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      final response = await Supabase.instance.client.auth.signUp(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+        data: {'name': nameController.text.trim()},
       );
+
+      if (response.user == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Signup failed')));
+        }
+      }
+
+      if (mounted) {
+        // Go to home or show verify email screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Signup failed: ${(e as AuthApiException).message}'),
+          ),
+        );
+      }
     } finally {
       setState(() => isLoading = false);
     }
@@ -56,58 +66,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
         padding: const EdgeInsets.all(24),
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Image.asset('assets/fittrack_logo.png', height: 100),
-                const SizedBox(height: 24),
-                CustomTextField(
-                  label: 'Name',
-                  icon: Icons.person,
-                  controller: nameController,
-                ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                  label: 'Email',
-                  icon: Icons.email,
-                  controller: emailController,
-                ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                  label: 'Password',
-                  icon: Icons.lock,
-                  isPassword: true,
-                  controller: passwordController,
-                ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                  label: 'Confirm Password',
-                  icon: Icons.lock_outline,
-                  isPassword: true,
-                  controller: confirmPasswordController,
-                ),
-                const SizedBox(height: 24),
-                PrimaryButton(
-                  text: isLoading ? 'Registering...' : 'Sign Up',
-                  onPressed: isLoading ? () {} : _signUp,
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Already have an account?"),
-                    TextButton(
-                      onPressed:
-                          () => Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const LoginScreen(),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const AppLogo(),
+                  const SizedBox(height: 24),
+                  CustomTextField(
+                    label: 'Name',
+                    icon: Icons.person,
+                    controller: nameController,
+                    validator: FormValidators.validateName,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    label: 'Email',
+                    icon: Icons.email,
+                    controller: emailController,
+                    validator: FormValidators.validateEmail,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    label: 'Password',
+                    icon: Icons.lock,
+                    isPassword: true,
+                    controller: passwordController,
+                    validator: FormValidators.validatePassword,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    label: 'Confirm Password',
+                    icon: Icons.lock_outline,
+                    isPassword: true,
+                    controller: confirmPasswordController,
+                    validator:
+                        (value) => FormValidators.confirmPassword(
+                          value,
+                          passwordController.text,
+                        ),
+                  ),
+                  const SizedBox(height: 24),
+                  PrimaryButton(
+                    text: isLoading ? 'Registering...' : 'Sign Up',
+                    onPressed: isLoading ? null : _signUp,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account?"),
+                      TextButton(
+                        onPressed:
+                            () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const LoginScreen(),
+                              ),
                             ),
-                          ),
-                      child: const Text("Login"),
-                    ),
-                  ],
-                ),
-              ],
+                        child: const Text("Login"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
