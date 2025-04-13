@@ -51,82 +51,93 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // const CircleAvatar(
-                //   radius: 45,
-                //   backgroundImage: AssetImage('assets/images/account.png'),
-                // ),
-                const SizedBox(width: 45),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 6),
-                        CustomTextField(
-                          label: 'Name',
-                          icon: Icons.person,
-                          controller: nameController,
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Email',
-                          icon: Icons.email_outlined,
-                          enabled: false,
-                          controller: emailController,
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "Gender",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        DropdownButtonFormField<String>(
-                          value: selectedGender,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedGender = value;
-                            });
-                          },
-                          items:
-                              genderList
-                                  .map(
-                                    (gender) => DropdownMenuItem<String>(
-                                      value: gender,
-                                      child: Text(gender),
-                                    ),
-                                  )
-                                  .toList(),
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                      ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: CircleAvatar(
+                      radius: 45,
+                      child: Icon(
+                        CupertinoIcons.profile_circled,
+                        size: 56,
+                        color: Colors.blue.shade900,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 8),
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 6),
+                          CustomTextField(
+                            label: 'Name',
+                            icon: Icons.person,
+                            controller: nameController,
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Email',
+                            icon: Icons.email_outlined,
+                            enabled: false,
+                            controller: emailController,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Gender",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          DropdownButtonFormField<String>(
+                            value: selectedGender,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedGender = value;
+                              });
+                            },
+                            items:
+                                genderList
+                                    .map(
+                                      (gender) => DropdownMenuItem<String>(
+                                        value: gender,
+                                        child: Text(gender),
+                                      ),
+                                    )
+                                    .toList(),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             PrimaryButton(
               text: 'Update User',
