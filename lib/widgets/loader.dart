@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:fit_track/widgets/logo.dart'; // Ensure this uses an SvgPicture
 import '../common_libs.dart';
 
 class AppLoader extends StatefulWidget {
@@ -33,13 +31,15 @@ class _AppLoaderState extends State<AppLoader> with TickerProviderStateMixin {
       _controller2.repeat();
     });
 
-    _wave1 = Tween<double>(begin: 1.0, end: 1.8).animate(
-      CurvedAnimation(parent: _controller1, curve: Curves.easeOut),
-    );
+    _wave1 = Tween<double>(
+      begin: 1.0,
+      end: 1.8,
+    ).animate(CurvedAnimation(parent: _controller1, curve: Curves.easeOut));
 
-    _wave2 = Tween<double>(begin: 1.0, end: 1.8).animate(
-      CurvedAnimation(parent: _controller2, curve: Curves.easeOut),
-    );
+    _wave2 = Tween<double>(
+      begin: 1.0,
+      end: 1.8,
+    ).animate(CurvedAnimation(parent: _controller2, curve: Curves.easeOut));
   }
 
   @override
@@ -60,33 +60,40 @@ class _AppLoaderState extends State<AppLoader> with TickerProviderStateMixin {
         children: [
           AnimatedBuilder(
             animation: _wave1,
-            builder: (_, __) => Container(
-              width: baseSize * _wave1.value,
-              height: baseSize * _wave1.value,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: waveColor.withAlpha(((0.4 * (2 - _wave1.value))*256).toInt()),
-              ),
-            ),
+            builder:
+                (_, __) => Container(
+                  width: baseSize * _wave1.value,
+                  height: baseSize * _wave1.value,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: waveColor.withAlpha(
+                      ((0.4 * (2 - _wave1.value)) * 256).toInt(),
+                    ),
+                  ),
+                ),
           ),
           AnimatedBuilder(
             animation: _wave2,
-            builder: (_, __) => Container(
-              width: baseSize * _wave2.value,
-              height: baseSize * _wave2.value,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: waveColor.withAlpha(((0.4 * (2 - _wave2.value))*256).toInt()),
-              ),
-            ),
+            builder:
+                (_, __) => Container(
+                  width: baseSize * _wave2.value,
+                  height: baseSize * _wave2.value,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: waveColor.withAlpha(
+                      ((0.4 * (2 - _wave2.value)) * 256).toInt(),
+                    ),
+                  ),
+                ),
           ),
           // Apply gradient mask to SVG
           ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [Colors.purple, Colors.blue],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds),
+            shaderCallback:
+                (bounds) => const LinearGradient(
+                  colors: [Colors.purple, Colors.blue],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(bounds),
             blendMode: BlendMode.srcIn,
             child: const AppLogo(), // Your SVG logo
           ),

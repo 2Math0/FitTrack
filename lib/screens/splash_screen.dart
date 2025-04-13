@@ -1,8 +1,5 @@
-import 'package:fit_track/widgets/loader.dart';
 
 import '../common_libs.dart';
-import 'home_screen.dart';
-import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
