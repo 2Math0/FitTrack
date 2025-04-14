@@ -202,7 +202,9 @@ class _ProfilePageState extends State<ProfilePage> {
           "Connect Google Fit",
           style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
         ),
-        onTap: () {},
+        onTap: () {
+          // Todo: do install health connect after succeed do authorization
+        },
       ),
     );
   }
