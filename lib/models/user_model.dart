@@ -16,8 +16,8 @@ class UserModel {
   // Convert from Supabase User Model to UserModel
   factory UserModel.fromSupabase(Map<String, dynamic>? supabaseUser) {
     return UserModel(
-      id: supabaseUser?['id'],
-      email: supabaseUser?['email'],
+      id: supabaseUser?['id'] ?? '',
+      email: supabaseUser?['email'] ?? '',
       name: supabaseUser?['user_metadata']['name'] ?? '',
       gender: supabaseUser?['user_metadata']['gender'] ?? '',
       createdAt:

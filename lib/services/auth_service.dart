@@ -103,9 +103,10 @@ class UserManager {
       userResponse = await supabase.auth.getUser();
     } catch (e) {
       _logger.e('Error fetching user: $e');
+      return null;
     }
 
-    user = UserModel.fromSupabase(userResponse?.user?.toJson() ?? {});
+    user = UserModel.fromSupabase(userResponse.user?.toJson() ?? {});
 
     // Convert Supabase user to custom UserModel
     return user;

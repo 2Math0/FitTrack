@@ -1,3 +1,4 @@
+import 'package:fit_track/screens/health_example.dart';
 import 'package:fit_track/screens/profile_page.dart';
 import 'package:flutter/material.dart';
 import '../screens/login_screen.dart';
@@ -11,6 +12,7 @@ sealed class AppRoutes {
   static const register = '/register';
   static const home = 'home';
   static const profile = '/profile';
+  static const health = '/health_example';
 }
 
 class AppNavigator {
@@ -26,6 +28,8 @@ class AppNavigator {
         return MaterialPageRoute(builder: (_) => const ProfilePage());
       case AppRoutes.home:
         return MaterialPageRoute(builder: (_) => const WelcomePage());
+      case AppRoutes.health:
+        return MaterialPageRoute(builder: (_) => const HealthApp());
       default:
         return MaterialPageRoute(
           builder:

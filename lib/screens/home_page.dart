@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../common_libs.dart';
+import '../utils/health_util.dart';
+import 'health_example.dart';
+
+final health = Health();
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,34 +25,116 @@ class _HomePageState extends State<HomePage> {
   int activeMinutes = 0;
   bool dataAvailable = true;
   final int goalSteps = 10000;
+  AppState _state = AppState.DATA_NOT_FETCHED;
+
+
+  List<HealthDataType> get types =>
+      (Platform.isAndroid)
+          ? dataTypesAndroid
+          : (Platform.isIOS)
+          ? dataTypesIOS
+          : [];
+
+  List<HealthDataAccess> get permissions =>
+      types
+          .map(
+            (type) =>
+                // can only request READ permissions to the following list of types on iOS
+                [
+                      HealthDataType.WALKING_HEART_RATE,
+                      HealthDataType.ELECTROCARDIOGRAM,
+                      HealthDataType.HIGH_HEART_RATE_EVENT,
+                      HealthDataType.LOW_HEART_RATE_EVENT,
+                      HealthDataType.IRREGULAR_HEART_RATE_EVENT,
+                      HealthDataType.EXERCISE_TIME,
+                    ].contains(type)
+                    ? HealthDataAccess.READ
+                    : HealthDataAccess.READ_WRITE,
+          )
+          .toList();
 
   @override
   void initState() {
     super.initState();
-    fetchHealthData();
+    Future.wait([fetchHealthData()]);
+  }
+
+  Future<bool> getHealthConnectSdkStatus() async {
+    assert(Platform.isAndroid, "This is only available on Android");
+
+    final HealthConnectSdkStatus? status =
+        await health.getHealthConnectSdkStatus();
+
+    Logger().d(status?.name);
+
+    return status == HealthConnectSdkStatus.sdkAvailable;
+  }
+
+  Future<bool> authorize() async {
+    // If we are trying to read Step Count, Workout, Sleep or other data that requires
+    // the ACTIVITY_RECOGNITION permission, we need to request the permission first.
+    // This requires a special request authorization call.
+    //
+    // The location permission is requested for Workouts using the Distance information.
+
+    await getHealthConnectSdkStatus();
+
+    await Permission.activityRecognition.request();
+    await Permission.location.request();
+
+    // Check if we have health permissions
+    bool? hasPermissions = await health.hasPermissions(
+      types,
+      permissions: permissions,
+    );
+
+    // hasPermissions = false because the hasPermission cannot disclose if WRITE access exists.
+    // Hence, we have to request with WRITE as well.
+    hasPermissions = false;
+
+    bool authorized = false;
+    if (!hasPermissions) {
+      // requesting access to the data types before reading them
+      try {
+        authorized = await health.requestAuthorization(
+          types,
+          permissions: permissions,
+        );
+
+        // request access to read historic data
+        await health.requestHealthDataHistoryAuthorization();
+      } catch (error) {
+        Logger().e("Exception in authorize: $error");
+      }
+    }
+
+    setState(
+          () =>
+      _state =
+      (authorized) ? AppState.AUTHORIZED : AppState.AUTH_NOT_GRANTED,
+    );
+    return (authorized);
   }
 
   Future<void> fetchHealthData() async {
-    final types = [
-      HealthDataType.STEPS,
-      HealthDataType.ACTIVE_ENERGY_BURNED,
-      HealthDataType.MOVE_MINUTES,
-    ];
-    final health = HealthFactory();
     final now = DateTime.now();
     final midnight = DateTime(now.year, now.month, now.day);
 
     // Request permissions
-    await Permission.activityRecognition.request();
+    // await Permission.activityRecognition.request();
 
-    bool accessWasGranted = await health.requestAuthorization(types);
+    bool accessWasGranted = await authorize();
 
     if (accessWasGranted) {
       try {
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          midnight,
-          now,
-          types,
+          types: types,
+          startTime: midnight,
+          endTime: now,
+        );
+
+        Logger().i(
+          healthData.map((d) => d.toJson().toString()).toList().toString(),
         );
 
         if (healthData.isEmpty) {
@@ -61,13 +149,15 @@ class _HomePageState extends State<HomePage> {
         for (var dp in healthData) {
           switch (dp.type) {
             case HealthDataType.STEPS:
-              totalSteps += (dp.value as int);
+              totalSteps += (dp.value as NumericHealthValue).numericValue.toInt();
               break;
             case HealthDataType.ACTIVE_ENERGY_BURNED:
-              totalCalories += (dp.value as double);
+              totalCalories += (dp.value as NumericHealthValue).numericValue;
               break;
-            case HealthDataType.MOVE_MINUTES:
-              totalMinutes += (dp.value as int);
+
+              // Todo: review data type
+              case HealthDataType.EXERCISE_TIME:
+              totalMinutes += (dp.value as NumericHealthValue).numericValue.toInt();
               break;
             default:
               break;
@@ -120,10 +210,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  IconButton(
-                    onPressed:
-                        () => AppNavigator.push(context, AppRoutes.profile),
-                    icon: Icon(CupertinoIcons.person),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed:
+                            () => AppNavigator.push(context, AppRoutes.profile),
+                        icon: Icon(CupertinoIcons.person),
+                      ),
+                      IconButton(
+                        onPressed:
+                            () => AppNavigator.push(context, AppRoutes.health),
+                        icon: Icon(CupertinoIcons.exclamationmark_circle),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -191,6 +290,21 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onPressed: () {},
                     child: Text('Log Activity'),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.blue.shade900,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: authorize,
+                    child: Text('Auth'),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
